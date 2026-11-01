@@ -1,0 +1,6 @@
+{
+  "name": "SpendWise - Personal Expense Tracker",
+  "description": "A clean, modern personal expense tracker with soft purple aesthetics, real-time transaction tracking, category filtering, LocalStorage persistence, and spending summaries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

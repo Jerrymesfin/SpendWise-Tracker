@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpendWise - Personal Expense Tracker</title>
+  <meta name="description" content="Personal expense tracker with soft purple theme, category filters, and LocalStorage." />
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-badge">🟣</div>
+        <div>
+          <h1>SpendWise</h1>
+          <p class="subtitle">Personal Expense Tracker</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="reset-demo-btn" class="secondary-btn" title="Reset sample transactions">
+          Reset Demo Data
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Summary Statistics Cards -->
+    <section class="stats-grid" aria-label="Expense Summary">
+      <div class="stat-card primary">
+        <span class="stat-label">Total Spent</span>
+        <h2 id="total-spent" class="stat-value">$0.00</h2>
+        <span class="stat-subtext" id="total-spent-subtext">Across all logged expenses</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Total Expenses</span>
+        <h2 id="total-count" class="stat-value">0</h2>
+        <span class="stat-subtext">Recorded transactions</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Average Expense</span>
+        <h2 id="average-spent" class="stat-value">$0.00</h2>
+        <span class="stat-subtext">Per transaction</span>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-label">Top Category</span>
+        <h2 id="top-category" class="stat-value">—</h2>
+        <span class="stat-subtext">Highest spending area</span>
+      </div>
+    </section>
+
+    <!-- Main Content Grid -->
+    <main class="dashboard-grid">
+      <!-- Left Column: Add Expense Form -->
+      <section class="card form-card">
+        <div class="card-header">
+          <h3>Add New Expense</h3>
+          <p class="card-subtitle">Fill in the details to record a new transaction</p>
+        </div>
+
+        <form id="expense-form" novalidate>
+          <!-- Title Input -->
+          <div class="form-group">
+            <label for="expense-title">Expense Title *</label>
+            <input 
+              type="text" 
+              id="expense-title" 
+              placeholder="e.g. Grocery store, Bus fare, Jeans" 
+              required 
+            />
+            <div class="quick-chips">
+              <span class="chips-label">Quick:</span>
+              <button type="button" class="chip-btn" data-preset="Groceries" data-cat="Food">Groceries</button>
+              <button type="button" class="chip-btn" data-preset="Metro Pass" data-cat="Transport">Metro Pass</button>
+              <button type="button" class="chip-btn" data-preset="Coffee" data-cat="Food">Coffee</button>
+              <button type="button" class="chip-btn" data-preset="New Shirt" data-cat="Shopping">New Shirt</button>
+            </div>
+          </div>
+
+          <!-- Amount and Date in 2 columns -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expense-amount">Amount ($) *</label>
+              <input 
+                type="number" 
+                id="expense-amount" 
+                step="0.01" 
+                min="0.01" 
+                placeholder="0.00" 
+                required 
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="expense-date">Date *</label>
+              <input 
+                type="date" 
+                id="expense-date" 
+                required 
+              />
+            </div>
+          </div>
+
+          <!-- Category Selection -->
+          <div class="form-group">
+            <label for="expense-category">Category *</label>
+            <select id="expense-category" required>
+              <option value="Food">🍽️ Food</option>
+              <option value="Transport">🚗 Transport</option>
+              <option value="Shopping">🛍️ Shopping</option>
+              <option value="Other">📦 Other</option>
+            </select>
+          </div>
+
+          <!-- Error Feedback Container -->
+          <div id="form-error" class="error-msg hidden"></div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="submit-btn">
+            + Add Expense
+          </button>
+        </form>
+      </section>
+
+      <!-- Right Column: Transactions & Filters -->
+      <section class="card list-card">
+        <div class="list-header">
+          <div>
+            <h3>Transactions List</h3>
+            <p class="card-subtitle" id="list-status">All recorded expenses</p>
+          </div>
+          <button id="export-csv-btn" class="export-btn" title="Download CSV backup">
+            Export CSV
+          </button>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="filter-bar" role="group" aria-label="Category filters">
+          <button class="filter-btn active" data-category="All">All (<span id="count-all">0</span>)</button>
+          <button class="filter-btn" data-category="Food">Food (<span id="count-food">0</span>)</button>
+          <button class="filter-btn" data-category="Transport">Transport (<span id="count-transport">0</span>)</button>
+          <button class="filter-btn" data-category="Shopping">Shopping (<span id="count-shopping">0</span>)</button>
+          <button class="filter-btn" data-category="Other">Other (<span id="count-other">0</span>)</button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box">
+          <input 
+            type="text" 
+            id="search-input" 
+            placeholder="Search by title..." 
+          />
+        </div>
+
+        <!-- Transactions Container -->
+        <ul id="expense-list" class="expense-list">
+          <!-- Dynamically populated by script.js -->
+        </ul>
+
+        <!-- Empty State Message -->
+        <div id="empty-state" class="empty-state hidden">
+          <div class="empty-icon">📭</div>
+          <h4>No expenses found</h4>
+          <p>Add your first expense on the left or try another filter.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
